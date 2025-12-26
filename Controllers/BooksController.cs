@@ -69,7 +69,19 @@ public class BooksController : BookstoreManegerControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult Create([FromBody] BookRequestJson request)
     {
-        
+        foreach (var b in _books)
+        {
+            if (b.Title == request.Title && b.Author == request.Author)
+            {
+                return Conflict(new ProblemDetails
+                {
+                    Title = "Livro já cadastrado",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = $"O livro {request.Title} do autor {request.Author} já está cadastrado"
+                });
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(request.Title) ||
             string.IsNullOrWhiteSpace(request.Author))
         {
